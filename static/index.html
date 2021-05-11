@@ -1,0 +1,164 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Try shorten</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="config.js"></script>
+</head>
+
+<body>
+    To create a new short URL, enter the URL and optionally your name to create. <br />
+    If you have entered a name, later you can update the generated short URL with a new URL. <br />
+    <div class="flex-container">
+        <div id="div1" class="container">
+            <div class="center">
+                <h2>Enter a URL to shorten:</h2>
+                <input id="txt_url1" maxlength="2048" size="50" />
+                <button type="button" id="btn_create">Create</button>
+                <h2>User Name (optional):</h2>
+                <input id="txt_name1" maxlength="512" size="30"/>
+                <h2>Short URL:</h2>
+                <input id="txt_short_url1" size="30"/>
+                <button type="button" id="btn_copy">Copy</button>
+                <label id="lbl_error1" />
+            </div>
+        </div>
+        <br />
+        <div id="div2" class="container">
+            User can only update the URL that created by themself.<br />
+            <div class="center">
+                <h2>Short URL:</h2>
+                <input id="txt_short_url2" size="30"/>
+                <h2>Enter new URL to update:</h2>
+                <input id="txt_url2" maxlength="2048" size="50" />
+                <button type="button" id="btn_update">Update</button>
+                <h2>User Name:</h2>
+                <input id="txt_name2" maxlength="512" size="30"/>
+                <label id="lbl_error2" />
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    $("label").hide();
+    const isLocalhost = Boolean(
+        window.location.hostname === "localhost" ||
+        // [::1] is the IPv6 localhost address.
+        window.location.hostname === "[::1]" ||
+        // 127.0.0.1/8 is considered localhost for IPv4.
+        window.location.hostname.match(
+            /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+        )
+    );
+
+    $("#btn_copy").click(function (e) {
+        /* Get the text field */
+        var copyText = document.getElementById("txt_short_url1");
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+    });
+    
+    $("#btn_create").click(function (e) {
+        e.preventDefault();
+        $("#lbl_error1").hide();
+        $("#txt_short_url1").val("");
+        url = $("#txt_url1").val().trim();
+        name = $("#txt_name1").val().trim();
+        console.log("url=" + url);
+        console.log("name=" + name);
+        if (url.length === 0) {
+            $("#lbl_error1").text('Please enter a URL.');
+            $("#lbl_error1").show();
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: appConfig.create,
+            data: JSON.stringify({
+                url: url,
+                user: name
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                $("lbl_error1").hide();
+                console.log(result)
+                $("#txt_short_url1").val(result);
+            },
+            error: function (result) {
+                console.log("error")
+                console.log(result)
+                $("#lbl_error1").text(result);
+                $("#lbl_error1").show();
+            }
+        });
+    });
+
+    $("#btn_update").click(function (e) {
+        e.preventDefault();
+        $("#lbl_error2").hide();
+        url = $("#txt_url2").val().trim();
+        name = $("#txt_name2").val().trim();
+        s_url = $("#txt_short_url2").val().trim();
+        console.log("url=" + url);
+        console.log("name=" + name);
+        console.log("short=" + s_url);
+        if (url.length === 0 || name.length === 0 || s_url.length === 0) {
+            $("#lbl_error2").text('All fields are required.');
+            $("#lbl_error2").show();
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/update",
+            data: JSON.stringify({
+                url: url,
+                user: name,
+                short_url: s_url
+            }),
+            contentType: "application/json",
+            success: function (result) {
+                $("#lbl_error2").text(result);
+                $("#lbl_error2").show();
+                console.log(result)
+            },
+            error: function (result) {
+                console.log("error")
+                $("#lbl_error2").show();
+                console.log(result)
+                $("#lbl_error2").text(result);
+            }
+        });
+    });
+
+</script>
+<style>
+    h2 {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 18;
+    }
+
+    .flex-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+
+    .container {
+        border: 1px solid gray;
+        margin: 10px;
+    }
+
+    .center {
+        margin: 10;
+    }
+</style>
+
+</html>
