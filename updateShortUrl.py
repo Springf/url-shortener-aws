@@ -16,9 +16,18 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         url =body['url']
         user = body['user']
-        s = Shortener(hash_shortener.shorten, DynamoDBStroe(table), regex_validator.validate)
+        short_url = body['short_url']
+        if not short_url.lower().startswith('http://') or len(short_url) < len(host):
+            result = 'Invalid short URL'
+        if short_url == url:
+            result = 'Cannot redirect to self.'
+        short_url = short_url[-8:]
         try:
-            result = f"{host}/{s.create(url, user)}"
+            s = Shortener(hash_shortener.shorten, DynamoDBStroe(table), regex_validator.validate)
+            if s.update(short_url, url, user):
+                result = 'URL updated successfully'
+            else: 
+                result = 'Cannot Update: either short URL does not exist or you are not the creator of the URL.'
         except ValueError as e:
             result = str(e)
     
