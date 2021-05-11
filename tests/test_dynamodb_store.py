@@ -1,4 +1,4 @@
-from ..store.dynamodb_store import DynamoDBStroe
+from store.dynamodb_store import DynamoDBStroe
 import pytest
 import boto3
 dynamo = boto3.resource('dynamodb')

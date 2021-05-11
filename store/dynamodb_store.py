@@ -1,4 +1,4 @@
-from ...core.store import Store
+from core.store.store import Store
 import boto3
 from botocore.exceptions import ClientError
 
