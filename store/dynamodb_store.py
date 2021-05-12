@@ -3,6 +3,9 @@ import boto3
 from botocore.exceptions import ClientError
 
 class DynamoDBStroe(Store):
+    """
+    Implement the Store using AWS DynamoDB as the backend
+    """
     def __init__(self, table) -> None:
         super().__init__()
         self.__store = boto3.client('dynamodb')
@@ -45,8 +48,6 @@ class DynamoDBStroe(Store):
             raise ValueError('URL or user cannot be empty.')
         item = self.__store.get_item(TableName = self.__table, AttributesToGet = [self.__url_key, self.__user_key], Key= { self.__partition_key : { 'S': short_url}})
         if 'Item' in item:
-            print(item)
-            print('abc')
             if user != item['Item'][self.__user_key]['S']:
                 return False
             else:

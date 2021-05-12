@@ -9,7 +9,11 @@ table = 'url_store'
 host = 'https://www.sggti.net'
 
 def lambda_handler(event, context):
-    print('myevent')
+    """
+    lambda function to call the shortener core api to retrieve the original URL based on shortened string.
+    return 302 redirect to the caller.
+    """
+    print('Received event:')
     print(event)
     result = 'error.html'
     
@@ -23,5 +27,5 @@ def lambda_handler(event, context):
     
     return {
         'statusCode': 302,
-        'headers': { 'Location': f'{result}', 'Access-Control-Allow-Origin': f'{host}'}
+        'headers': { 'Location': f'{result}'}
     }

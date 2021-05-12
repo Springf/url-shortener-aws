@@ -9,7 +9,10 @@ table = 'url_store'
 host = 'https://www.sggti.net'
 
 def lambda_handler(event, context):
-    print('myevent')
+    """
+    lambda function to call the shortener core api to update an existing shortened string's original URL to a new URL.
+    """
+    print('Received event:')
     print(event)
     result = ''
     if event['body']:
@@ -17,10 +20,13 @@ def lambda_handler(event, context):
         url =body['url']
         user = body['user']
         short_url = body['short_url']
-        if not short_url.lower().startswith('http://') or len(short_url) < len(host):
+        
+        #some minimum validation
+        if not short_url.lower().startswith(host):
             result = 'Invalid short URL'
         if short_url == url:
             result = 'Cannot redirect to self.'
+        #get the shortened string only as core api expects no domain name
         short_url = short_url[-8:]
         try:
             s = Shortener(hash_shortener.shorten, DynamoDBStroe(table), regex_validator.validate)
@@ -33,6 +39,6 @@ def lambda_handler(event, context):
     
     return {
         'statusCode': 200,
-        'headers': { 'Access-Control-Allow-Origin': f'{host}', 'Content-Type': 'text/html; charset=utf-8'},
+        'headers': {  'Content-Type': 'text/html; charset=utf-8'},
         'body': f'{result}'
     }

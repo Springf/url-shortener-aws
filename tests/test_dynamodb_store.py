@@ -5,6 +5,9 @@ dynamo = boto3.resource('dynamodb')
 table = 'url_test_store'
 
 def clean(tableName):
+    """
+    clean the test table contents before each testing.
+    """
     table = dynamo.Table(tableName)
     
     #get the table keys

@@ -9,7 +9,10 @@ table = 'url_store'
 host = 'https://www.sggti.net'
 
 def lambda_handler(event, context):
-    print('myevent')
+    """
+    lambda function to call the shortener core api to create the shortened string
+    """
+    print('Received event:')
     print(event)
     result = ''
     if event['body']:
@@ -21,9 +24,11 @@ def lambda_handler(event, context):
             result = f"{host}/{s.create(url, user)}"
         except ValueError as e:
             result = str(e)
-    
+    else:
+        result = 'Error creating short URL: bad input.'
+
     return {
         'statusCode': 200,
-        'headers': { 'Access-Control-Allow-Origin': f'{host}', 'Content-Type': 'text/html; charset=utf-8'},
+        'headers': { 'Content-Type': 'text/html; charset=utf-8'},
         'body': f'{result}'
     }
